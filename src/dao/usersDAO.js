@@ -39,7 +39,7 @@ export default class UsersDAO {
   static async getUser(email) {
     // TODO Ticket: User Management
     // Retrieve the user document corresponding with the user's email.
-    return await users.findOne({ someField: "someValue" })
+    return await users.findOne({ email: email })
   }
 
   /**
@@ -60,8 +60,17 @@ export default class UsersDAO {
       // Insert a user with the "name", "email", and "password" fields.
       // TODO Ticket: Durable Writes
       // Use a more durable Write Concern for this operation.
-      await users.insertOne({ someField: "someValue" })
-      return { success: true }
+      let {
+        result: { n, error },
+      } = await users.insertOne({
+        name: userInfo.name,
+        email: userInfo.email,
+        password: userInfo.password,
+      })
+
+      let response = { success: n, error: error }
+      console.log(`DA: ${response.success} ${response.error}`)
+      return response
     } catch (e) {
       if (String(e).startsWith("MongoError: E11000 duplicate key error")) {
         return { error: "A user with the given email already exists." }
@@ -169,8 +178,8 @@ export default class UsersDAO {
       // TODO Ticket: User Preferences
       // Use the data in "preferences" to update the user's preferences.
       const updateResponse = await users.updateOne(
-        { someField: someValue },
-        { $set: { someOtherField: someOtherValue } },
+        { someField: "someValue" },
+        { $set: { someOtherField: "someOtherValue" } },
       )
 
       if (updateResponse.matchedCount === 0) {
