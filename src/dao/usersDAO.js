@@ -62,11 +62,14 @@ export default class UsersDAO {
       // Use a more durable Write Concern for this operation.
       let {
         result: { n, error },
-      } = await users.insertOne({
-        name: userInfo.name,
-        email: userInfo.email,
-        password: userInfo.password,
-      })
+      } = await users.insertOne(
+        {
+          name: userInfo.name,
+          email: userInfo.email,
+          password: userInfo.password,
+        },
+        { w: "majority" },
+      )
 
       return { success: n, error: error }
     } catch (e) {
